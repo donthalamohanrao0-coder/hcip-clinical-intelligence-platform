@@ -1,5 +1,7 @@
 # HCIP — Healthcare Clinical Intelligence Platform
 
+[![CI](https://github.com/donthalamohanrao0-coder/hcip-clinical-intelligence-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/donthalamohanrao0-coder/hcip-clinical-intelligence-platform/actions/workflows/ci.yml)
+
 A multi-tenant, agentic RAG platform that lets clinicians ask evidence-based medical
 questions and get cited, safety-checked answers streamed back in real time — built on
 a 5-agent LangGraph pipeline over hybrid retrieval (vector + keyword + knowledge graph).

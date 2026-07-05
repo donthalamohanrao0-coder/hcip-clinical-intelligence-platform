@@ -1,0 +1,61 @@
+name: CI
+
+# Honest about what this checks today: there's no automated test suite yet
+# (see README § Roadmap), so this pipeline verifies the two things that would
+# otherwise only be caught by hand — that the backend actually imports/compiles
+# cleanly, and that the frontend type-checks and builds — on every push and PR.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend — compile & import check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+          cache-dependency-path: requirements-query.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-query.txt
+
+      - name: Byte-compile all Python source
+        run: python -m compileall -q api ingestion query observability
+
+      - name: Import smoke test (FastAPI app must construct with zero env vars)
+        run: python -c "from api.main import app; print('FastAPI app created OK:', app.title)"
+
+  frontend:
+    name: Frontend — type-check & build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up env for build (placeholder values — no real backend needed to build)
+        run: cp .env.local.example .env.local
+
+      - name: Type-check
+        run: npm run type-check
+
+      - name: Build
+        run: npm run build
