@@ -1,0 +1,50 @@
+# ── Secrets & credentials — never commit these ────────────────────────────────
+.env
+.env.local
+.env.local.*
+!.env.example
+!.env.local.example
+*.pem
+*.key
+ec2_info.txt
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Node / Next.js ───────────────────────────────────────────────────────────
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+*.tsbuildinfo
+npm-debug.log*
+
+# ── Build artifacts / deployment bundles ──────────────────────────────────────
+frontend-standalone.tar.gz
+*.tar.gz
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+api.log
+frontend.log
+
+# ── OS / editor cruft ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ── Claude Code tooling (local, not part of the product) ──────────────────────
+.claude/
+.agents/
+
+# ── Misc local scratch ───────────────────────────────────────────────────────
+scroll_result.json
+persist_test.txt

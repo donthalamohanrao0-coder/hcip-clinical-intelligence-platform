@@ -1,0 +1,16 @@
+[Unit]
+Description=HCIP FastAPI Backend
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/hcip
+ExecStart=/home/ubuntu/hcip/.venv/bin/uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 2 --log-level info
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/home/ubuntu/hcip/api.log
+StandardError=append:/home/ubuntu/hcip/api.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+[Unit]
+Description=HCIP Next.js Frontend
+After=network.target hcip-api.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/hcip-frontend/.next/standalone
+Environment=HCIP_API_URL=http://localhost:8000
+# Replace with one of the raw keys from your own API_KEYS entry in .env
+Environment=HCIP_API_KEY=REPLACE_WITH_YOUR_API_KEY
+Environment=NEXT_PUBLIC_DEFAULT_KB_ID=kb-clinical-2024
+Environment=PORT=3000
+Environment=HOSTNAME=0.0.0.0
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/home/ubuntu/frontend.log
+StandardError=append:/home/ubuntu/frontend.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,211 @@
+{
+  "title": "HCIP — RAG Pipeline Overview",
+  "uid": "hcip-overview",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "15s",
+  "time": { "from": "now-1h", "to": "now" },
+  "timezone": "browser",
+  "tags": ["hcip", "rag", "healthcare"],
+  "panels": [
+
+    {
+      "id": 1,
+      "title": "Query Rate (req/min)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 8 },
+      "targets": [{
+        "expr": "rate(hcip_query_total[1m]) * 60",
+        "legendFormat": "{{status}}"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "reqpm"
+        }
+      }
+    },
+
+    {
+      "id": 2,
+      "title": "Latency Percentiles (seconds)",
+      "type": "timeseries",
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(hcip_query_latency_seconds_bucket[5m]))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(hcip_query_latency_seconds_bucket[5m]))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, rate(hcip_query_latency_seconds_bucket[5m]))",
+          "legendFormat": "p99"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": { "lineWidth": 2, "fillOpacity": 5 }
+        }
+      }
+    },
+
+    {
+      "id": 3,
+      "title": "Cache Hit Rate",
+      "type": "stat",
+      "gridPos": { "x": 16, "y": 0, "w": 8, "h": 4 },
+      "targets": [{
+        "expr": "sum(rate(hcip_query_total{cache_hit=\"true\"}[5m])) / sum(rate(hcip_query_total[5m])) * 100",
+        "legendFormat": "Hit rate %"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red",    "value": null },
+              { "color": "yellow", "value": 20   },
+              { "color": "green",  "value": 40   }
+            ]
+          },
+          "mappings": []
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" }
+    },
+
+    {
+      "id": 4,
+      "title": "Error Rate",
+      "type": "stat",
+      "gridPos": { "x": 16, "y": 4, "w": 8, "h": 4 },
+      "targets": [{
+        "expr": "sum(rate(hcip_query_total{status=\"error\"}[5m])) / sum(rate(hcip_query_total[5m])) * 100",
+        "legendFormat": "Error %"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null },
+              { "color": "yellow", "value": 1    },
+              { "color": "red",    "value": 5    }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" }
+    },
+
+    {
+      "id": 5,
+      "title": "Confidence Score Distribution",
+      "type": "histogram",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [{
+        "expr": "hcip_confidence_score_bucket",
+        "legendFormat": "{{le}}"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "blue", "mode": "fixed" },
+          "custom": { "fillOpacity": 60 }
+        }
+      },
+      "options": { "bucketSize": "auto", "fillOpacity": 60 }
+    },
+
+    {
+      "id": 6,
+      "title": "Cache Hits by Layer",
+      "type": "barchart",
+      "gridPos": { "x": 12, "y": 8, "w": 6, "h": 8 },
+      "targets": [{
+        "expr": "sum by (layer) (increase(hcip_cache_hits_total[1h]))",
+        "legendFormat": "{{layer}}"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 80 }
+        }
+      }
+    },
+
+    {
+      "id": 7,
+      "title": "Safety Flags by Severity",
+      "type": "barchart",
+      "gridPos": { "x": 18, "y": 8, "w": 6, "h": 8 },
+      "targets": [{
+        "expr": "sum by (severity) (increase(hcip_safety_flags_total[1h]))",
+        "legendFormat": "{{severity}}"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 80 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "critical" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "high"     }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "medium"   }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "low"      }, "properties": [{ "id": "color", "value": { "fixedColor": "green",  "mode": "fixed" } }] }
+        ]
+      }
+    },
+
+    {
+      "id": 8,
+      "title": "Pipeline Errors by Stage",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 6 },
+      "targets": [{
+        "expr": "sum by (stage) (rate(hcip_pipeline_errors_total[5m]))",
+        "legendFormat": "{{stage}}"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 1, "fillOpacity": 20 },
+          "unit": "errors/s"
+        }
+      }
+    },
+
+    {
+      "id": 9,
+      "title": "Escalation Rate",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 6 },
+      "targets": [{
+        "expr": "sum(rate(hcip_query_total{escalated=\"true\"}[5m])) / sum(rate(hcip_query_total[5m])) * 100",
+        "legendFormat": "Escalated %"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "fixedColor": "orange", "mode": "fixed" },
+          "custom": { "lineWidth": 2, "fillOpacity": 15 },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null },
+              { "color": "yellow", "value": 5    },
+              { "color": "red",    "value": 20   }
+            ]
+          }
+        }
+      }
+    }
+
+  ]
+}

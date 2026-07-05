@@ -1,0 +1,67 @@
+# ── Core framework ────────────────────────────────────────────────────────────
+pydantic>=2.7,<3.0
+pydantic-settings>=2.3,<3.0
+
+# ── Document parsing ──────────────────────────────────────────────────────────
+docling>=2.0                    # primary parser: text, tables, figures, citations
+paddleocr>=2.8                  # OCR for scanned PDFs and images
+paddlepaddle>=2.6               # PaddleOCR dependency
+
+# ── Multimodal (ColQwen — triggered only for charts/forms) ───────────────────
+colpali-engine>=0.3             # ColQwen image embeddings
+
+# ── Embeddings ────────────────────────────────────────────────────────────────
+FlagEmbedding>=1.2              # BGE-M3 text embeddings
+sentence-transformers>=3.0      # semantic chunking similarity
+
+# ── Vector store ─────────────────────────────────────────────────────────────
+qdrant-client>=1.9
+
+# ── Graph database ────────────────────────────────────────────────────────────
+neo4j>=5.20
+
+# ── Relational / auth ─────────────────────────────────────────────────────────
+supabase>=2.5
+
+# ── Object storage ────────────────────────────────────────────────────────────
+boto3>=1.34
+
+# ── Queue / workers ───────────────────────────────────────────────────────────
+celery>=5.4
+redis>=5.0
+
+# ── LLM (metadata enrichment & classification fallback only) ─────────────────
+openai>=1.30
+
+# ── NLP / NER ─────────────────────────────────────────────────────────────────
+spacy>=3.7
+# After install run: python -m spacy download en_core_sci_md
+
+# ── API layer (Phase 22) ──────────────────────────────────────────────────────
+fastapi>=0.111,<1.0             # REST framework
+uvicorn[standard]>=0.30         # ASGI server (includes websockets + httptools)
+python-jose[cryptography]>=3.3  # JWT encode / decode
+bcrypt>=4.1                     # password hashing
+
+# ── Query pipeline (Phase 14–21) ──────────────────────────────────────────────
+langgraph>=0.2                  # LangGraph multi-agent orchestration
+langchain-core>=0.2             # base message / chain primitives
+langchain-openai>=0.1           # ChatOpenAI, OpenAI embeddings
+elasticsearch[async]>=8.13      # AsyncElasticsearch BM25 retrieval
+cross-encoder>=0.1; python_requires>="3.9"  # re-ranking (sentence-transformers alias)
+
+# ── Observability (Phase 24) ──────────────────────────────────────────────────
+prometheus-client>=0.20                         # /metrics endpoint + counters/histograms
+opentelemetry-api>=1.27                         # OTEL API (tracer, span)
+opentelemetry-sdk>=1.27                         # TracerProvider, BatchSpanProcessor
+opentelemetry-exporter-otlp-proto-http>=1.27    # OTLP HTTP exporter → Grafana Tempo
+opentelemetry-instrumentation-fastapi>=0.48b0   # auto-instrument FastAPI routes
+langfuse>=2.32                                  # LLM call tracing (cost, tokens, quality)
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+python-dotenv>=1.0
+python-multipart>=0.0.9         # file upload handling in FastAPI
+datasketch>=1.6                 # MinHash for duplicate chunk detection
+httpx>=0.27                     # async HTTP (PubMed, ontology APIs)
+tenacity>=8.3                   # retry logic for external API calls
+structlog>=24.0                 # structured logging
